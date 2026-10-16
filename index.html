@@ -24,7 +24,7 @@
     }
     h2, h3 { margin-top: 0; }
     label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; }
-    input {
+    input, select {
       width: 100%;
       padding: 10px;
       margin-top: 4px;
@@ -32,6 +32,7 @@
       border-radius: 8px;
       box-sizing: border-box;
       font-size: 16px;
+      background: #fff;
     }
     button {
       width: 100%;
@@ -68,7 +69,16 @@
       <input type="text" id="fullName" placeholder="Олександр Іванов" required>
 
       <label for="phone">Номер телефону</label>
-      <input type="tel" id="phone" placeholder="+380971234567" required>
+      <input type="tel" id="phone" placeholder="+48 123 456 789" required>
+
+      <label for="city">Місто</label>
+      <select id="city" required>
+        <option value="" disabled selected>Оберіть місто</option>
+        <option value="Варшава">Варшава</option>
+        <option value="Краків">Краків</option>
+        <option value="Вроцлав">Вроцлав</option>
+        <option value="Гданськ">Гданськ</option>
+      </select>
 
       <button type="submit">Зберегти та дивитися зміни</button>
     </form>
@@ -81,9 +91,9 @@
     <!-- Приклад однієї зміни -->
     <div class="card" style="border: 1px solid #eee;">
       <h4>Ресторан "Grand Cafe"</h4>
-      <p>📍 вул. Хрещатик, 15</p>
+      <p>📍 Варшава, центр</p>
       <p>⏱️ Завтра, 14:00 - 22:00 (8 годин)</p>
-      <span class="shift-tag">150 грн/год</span>
+      <span class="shift-tag">35 злотих/год</span>
       <button onclick="takeShift('Grand Cafe')">Забронювати зміну</button>
     </div>
   </div>
@@ -107,6 +117,7 @@
       const userData = {
         fullName: document.getElementById('fullName').value,
         phone: document.getElementById('phone').value,
+        city: document.getElementById('city').value,
         username: tgUsername
       };
 
