@@ -100,16 +100,23 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // ВСТАВТЕ СЮДИ ВАШІ ДАНІ:
-    const BOT_TOKEN = "8971102051:AAHwUnuWBy6AEFQPFjESwtULTYv8b6kL4Y8";
+    const BOT_TOKEN = "8971102051:AAGaWLdVNd-a07ZUk3kKJlxaNqqiLSG2TKs";
     const ADMIN_CHAT_ID = "1537392635";
 
     const tgUser = tg.initDataUnsafe?.user;
+    const tgUserId = tgUser ? tgUser.id : 'guest';
     const tgUsername = tgUser ? `@${tgUser.username}` : 'немає юзернейму';
 
-    const form = document.getElementById('profileForm');
     const regForm = document.getElementById('registration-form');
     const shiftsList = document.getElementById('shifts-list');
+    const form = document.getElementById('profileForm');
+
+    // Перевіряємо, чи користувач уже зареєстрований раніше
+    const savedUser = localStorage.getItem('kelner_user_' + tgUserId);
+    if (savedUser) {
+      regForm.classList.add('hidden');
+      shiftsList.classList.remove('hidden');
+    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -122,11 +129,13 @@
       const phone = document.getElementById('phone').value;
       const city = document.getElementById('city').value;
 
-      const text = `📥 Нова анкета офіціанта!\n\n` +
-                   `👤 ПІБ: ${fullName}\n` +
-                   `📞 Телефон: ${phone}\n` +
-                   `🏙️ Місто: ${city}\n` +
-                   `💬 Telegram: ${tgUsername}`;
+      const userData = { fullName, phone, city, tgUsername };
+
+      const text = `📥 **Нова анкета офіціанта!**\n\n` +
+                   `👤 **ПІБ:** ${fullName}\n` +
+                   `📞 **Телефон:** ${phone}\n` +
+                   `🏙️ **Місто:** ${city}\n` +
+                   `💬 **Telegram:** ${tgUsername}`;
 
       try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -134,9 +143,13 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: ADMIN_CHAT_ID,
-            text: text
+            text: text,
+            parse_mode: 'Markdown'
           })
         });
+
+        // Зберігаємо дані в пам'ять пристрою
+        localStorage.setItem('kelner_user_' + tgUserId, JSON.stringify(userData));
 
         regForm.classList.add('hidden');
         shiftsList.classList.remove('hidden');
