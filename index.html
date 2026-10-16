@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Підробіток Офіціантом</title>
-  <!-- Скрипт Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
@@ -80,15 +79,14 @@
         <option value="Гданськ">Гданськ</option>
       </select>
 
-      <button type="submit">Зберегти та дивитися зміни</button>
+      <button type="submit" id="submitBtn">Зберегти та дивитися зміни</button>
     </form>
   </div>
 
-  <!-- СЕКЦІЯ ЗМІН (ВІДКРИВАЄТЬСЯ ПІСЛЯ РЕЄСТРАЦІЇ) -->
+  <!-- СЕКЦІЯ ЗМІН -->
   <div id="shifts-list" class="card hidden">
     <h3>Доступні підробітки</h3>
     
-    <!-- Приклад однієї зміни -->
     <div class="card" style="border: 1px solid #eee;">
       <h4>Ресторан "Grand Cafe"</h4>
       <p>📍 Варшава, центр</p>
@@ -99,38 +97,220 @@
   </div>
 
   <script>
-    // Ініціалізація Telegram WebApp
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Розгортаємо додаток на весь екран
+    tg.expand();
 
-    // Отримуємо username з Telegram
+    // ВСТАВТЕ СЮДИ ВАШІ ДАНІ:
+    const BOT_TOKEN = "ВАШ_НОВИЙ_ТОКЕН_ВІД_BOTFATHER";
+    const ADMIN_CHAT_ID = <!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Підробіток Офіціантом</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--tg-theme-bg-color, #f4f4f5);
+      color: var(--tg-theme-text-color, #222);
+      margin: 0;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: var(--tg-theme-secondary-bg-color, #ffffff);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    h2, h3 { margin-top: 0; }
+    label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 16px;
+      background: #fff;
+    }
+    button {
+      width: 100%;
+      background-color: var(--tg-theme-button-color, #0088cc);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+    .hidden { display: none; }
+    .shift-tag {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- СЕКЦІЯ РЕЄСТРАЦІЇ -->
+  <div id="registration-form" class="card">
+    <h2>Анкета офіціанта</h2>
+    <form id="profileForm">
+      <label for="fullName">Ім'я та Прізвище</label>
+      <input type="text" id="fullName" placeholder="Олександр Іванов" required>
+
+      <label for="phone">Номер телефону</label>
+      <input type="tel" id="phone" placeholder="+48 123 456 789" required>
+
+      <label for="city">Місто</label>
+      <select id="city" required>
+        <option value="" disabled selected>Оберіть місто</option>
+        <option value="Варшава">Варшава</option>
+        <option value="Краків">Краків</option>
+        <option value="Вроцлав">Вроцлав</option>
+        <option value="Гданськ">Гданськ</option>
+      </select>
+
+      <button type="submit" id="submitBtn">Зберегти та дивитися зміни</button>
+    </form>
+  </div>
+
+  <!-- СЕКЦІЯ ЗМІН -->
+  <div id="shifts-list" class="card hidden">
+    <h3>Доступні підробітки</h3>
+    
+    <div class="card" style="border: 1px solid #eee;">
+      <h4>Ресторан "Grand Cafe"</h4>
+      <p>📍 Варшава, центр</p>
+      <p>⏱️ Завтра, 14:00 - 22:00 (8 годин)</p>
+      <span class="shift-tag">35 злотих/год</span>
+      <button onclick="takeShift('Grand Cafe')">Забронювати зміну</button>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // ВСТАВТЕ СЮДИ ВАШІ ДАНІ:
+    const BOT_TOKEN = "8971102051:AAHwUnuWBy6AEFQPFjESwtULTYv8b6kL4Y8";
+    const ADMIN_CHAT_ID = "1537392635";
+
     const tgUser = tg.initDataUnsafe?.user;
-    const tgUsername = tgUser ? tgUser.username : 'невідомо';
+    const tgUsername = tgUser ? `@${tgUser.username}` : 'немає юзернейму';
 
     const form = document.getElementById('profileForm');
     const regForm = document.getElementById('registration-form');
     const shiftsList = document.getElementById('shifts-list');
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const userData = {
-        fullName: document.getElementById('fullName').value,
-        phone: document.getElementById('phone').value,
-        city: document.getElementById('city').value,
-        username: tgUsername
-      };
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "Надсилання...";
+      btn.disabled = true;
 
-      console.log('Дані користувача:', userData);
-      
-      // Переключаємо екран на список змін
-      regForm.classList.add('hidden');
-      shiftsList.classList.remove('hidden');
+      const fullName = document.getElementById('fullName').value;
+      const phone = document.getElementById('phone').value;
+      const city = document.getElementById('city').value;
+
+      // Текст повідомлення, яке прийде вам у чат
+      const text = `📥 **Нова анкета офіціанта!**\n\n` +
+                   `👤 **ПІБ:** ${fullName}\n` +
+                   `📞 **Телефон:** ${phone}\n` +
+                   `🏙️ **Місто:** ${city}\n` +
+                   `💬 **Telegram:** ${tgUsername}`;
+
+      try {
+        // Надсилаємо дані через Telegram Bot API
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: ADMIN_CHAT_ID,
+            text: text,
+            parse_mode: 'Markdown'
+          })
+        });
+
+        // Переключаємо екран
+        regForm.classList.add('hidden');
+        shiftsList.classList.remove('hidden');
+      } catch (error) {
+        alert("Помилка надсилання. Спробуйте ще раз.");
+        btn.innerText = "Зберегти та дивитися зміни";
+        btn.disabled = false;
+      }
     });
 
     function takeShift(restaurant) {
-      tg.sendData(JSON.stringify({ action: "take_shift", restaurant: restaurant }));
-      alert(`Ви відгукнулися на зміну в ${restaurant}!`);
+      alert(`Ви відгукнулися на зміну в ${restaurant}! Менеджер зв'яжеться з вами.`);
+    }
+  </script>
+</body>
+</html>;
+
+    const tgUser = tg.initDataUnsafe?.user;
+    const tgUsername = tgUser ? `@${tgUser.username}` : 'немає юзернейму';
+
+    const form = document.getElementById('profileForm');
+    const regForm = document.getElementById('registration-form');
+    const shiftsList = document.getElementById('shifts-list');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "Надсилання...";
+      btn.disabled = true;
+
+      const fullName = document.getElementById('fullName').value;
+      const phone = document.getElementById('phone').value;
+      const city = document.getElementById('city').value;
+
+      // Текст повідомлення, яке прийде вам у чат
+      const text = `📥 **Нова анкета офіціанта!**\n\n` +
+                   `👤 **ПІБ:** ${fullName}\n` +
+                   `📞 **Телефон:** ${phone}\n` +
+                   `🏙️ **Місто:** ${city}\n` +
+                   `💬 **Telegram:** ${tgUsername}`;
+
+      try {
+        // Надсилаємо дані через Telegram Bot API
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: ADMIN_CHAT_ID,
+            text: text,
+            parse_mode: 'Markdown'
+          })
+        });
+
+        // Переключаємо екран
+        regForm.classList.add('hidden');
+        shiftsList.classList.remove('hidden');
+      } catch (error) {
+        alert("Помилка надсилання. Спробуйте ще раз.");
+        btn.innerText = "Зберегти та дивитися зміни";
+        btn.disabled = false;
+      }
+    });
+
+    function takeShift(restaurant) {
+      alert(`Ви відгукнулися на зміну в ${restaurant}! Менеджер зв'яжеться з вами.`);
     }
   </script>
 </body>
