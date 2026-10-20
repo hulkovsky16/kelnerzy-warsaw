@@ -101,7 +101,7 @@
         <label for="city">Місто</label>
         <select id="city" required>
           <option value="" disabled selected>Оберіть місто</option>
-          <option>Варшава</option><option>Краків</option><option>Вроцлав</option><option>Гданськ</option>
+          <option>Варшава</option><option>Краків</option><option>Вроцлав</option><option>Гданськ</option><option>Познань</option>
         </select>
         <button type="submit" class="btn">Зберегти та продовжити</button>
       </form>
@@ -137,12 +137,11 @@
     <div class="card admin">
       <h3>Нова зміна</h3>
       <form id="addShiftForm">
-        <label>Ресторан</label>
-        <input type="text" id="resName" placeholder="Grand Cafe" maxlength="80" required>
         <label>Місто</label>
-        <select id="resCity" required>
-          <option>Варшава</option><option>Краків</option><option>Вроцлав</option><option>Гданськ</option>
-        </select>
+        <select id="resCity" required></select>
+        <label>Готель / ресторан</label>
+        <select id="resHotel" required></select>
+        <input type="text" id="resName" class="hidden" placeholder="Назва закладу" maxlength="80">
         <label>Дата</label>
         <input type="date" id="resDate" required>
         <label>Години</label>
@@ -284,6 +283,29 @@
       </div>`).join('');
 
     $('resDate').min = today();
+        // ✏️ Назви готелів можна редагувати тут
+    const MANUAL = '__manual__';
+    const HOTELS = {
+      'Варшава': ['Intercontinental', 'HolidayInn', 'Gromada', 'Boss'],
+      'Краків': ['Copernicus', 'Hotel Stary', 'Grand Hotel Kraków'],
+      'Вроцлав': ['The Bridge', 'Monopol', 'Altus Palace'],
+      'Гданськ': ['Radisson Blu', 'Hilton', 'Boutique'],
+      'Познань': ['City Park Hotel & Residence', 'Blow Up Hall', 'Sheraton']
+    };
+    const opt = (v, t) => `<option value="${esc(v)}">${esc(t ?? v)}</option>`;
+    function toggleManual() {
+      const m = $('resHotel').value === MANUAL;
+      $('resName').classList.toggle('hidden', !m);
+      $('resName').required = m;
+    }
+    function fillHotels() {
+      $('resHotel').innerHTML = HOTELS[$('resCity').value].map(h => opt(h)).join('') + opt(MANUAL, '✍️ Інший (вручну)');
+      toggleManual();
+    }
+    $('resCity').innerHTML = Object.keys(HOTELS).map(c => opt(c)).join('');
+    $('resCity').addEventListener('change', fillHotels);
+    $('resHotel').addEventListener('change', toggleManual);
+    fillHotels();
 
     $('profileForm').addEventListener('submit', e => {
       e.preventDefault();
@@ -300,10 +322,11 @@
       busy = true;
       try {
         state = await api('addShift', {
-          name: $('resName').value, city: $('resCity').value, date: $('resDate').value,
+          name: $('resHotel').value === MANUAL ? $('resName').value : $('resHotel').value,
+          city: $('resCity').value, date: $('resDate').value,
           time: $('resTime').value, pay: $('resPay').value
         });
-        e.target.reset();
+        e.target.reset(); fillHotels();
         render();
         alert('Зміну додано!');
       } catch (err) { alert('Помилка: ' + err.message); }
