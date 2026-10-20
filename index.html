@@ -90,19 +90,17 @@
     tg.ready();
     tg.expand();
 
-    // Той самий URL: оновлюйте розгортання через Deploy → Manage deployments → Edit → New version
     const API_URL = "https://script.google.com/macros/s/AKfycbyZ4rDoWnp0BSr4Slz7Axme6V0od1LF9-9RkJqCxjWknf-q3UQB9o5y7W_g69XxPt4y/exec";
 
     const $ = id => document.getElementById(id);
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const LS_KEY = 'kelner_user_' + (tg.initDataUnsafe?.user?.id ?? 'guest'); // лише ключ кешу анкети; роль визначає сервер
+    const LS_KEY = 'kelner_user_' + (tg.initDataUnsafe?.user?.id ?? 'guest');
     const statusCls = s => ({ 'Підтверджено': 'yes', 'Відхилено': 'no' }[s] || 'wait');
     const profile = () => { try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; } };
 
     let state = { role: null, shifts: [], bookings: [] };
     let busy = false;
 
-    // Єдина точка звернення до бекенду (GET, без CORS-проблем). Підпис initData перевіряє сервер.
     async function api(action, payload = {}) {
       const qs = new URLSearchParams({ action, auth: tg.initData, p: JSON.stringify(payload) });
       const res = await fetch(API_URL + '?' + qs);
@@ -156,17 +154,15 @@
       }
     }
 
-    // Реєстрація працівника
     $('profileForm').addEventListener('submit', e => {
       e.preventDefault();
       localStorage.setItem(LS_KEY, JSON.stringify({
         fullName: $('fullName').value.trim(), phone: $('phone').value.trim(), city: $('city').value
       }));
-      try { tg.requestWriteAccess && tg.requestWriteAccess(); } catch {} // дозвіл боту писати в особисті (для сповіщень)
+      try { tg.requestWriteAccess && tg.requestWriteAccess(); } catch {}
       render();
     });
 
-    // Адмін: нова зміна
     $('addShiftForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (busy) return;
@@ -182,7 +178,6 @@
       finally { busy = false; }
     });
 
-    // Усі кнопки в списках — через делегування (без inline onclick, безпечно для будь-яких назв)
     document.addEventListener('click', async e => {
       const btn = e.target.closest('[data-act]');
       if (!btn || busy) return;
@@ -208,7 +203,6 @@
       finally { busy = false; btn.disabled = false; }
     });
 
-    // Статуси «в реальному часі»: оновлення кожні 15 с, поки додаток відкритий
     setInterval(() => { if (!document.hidden && !busy && state.role) load(); }, 15000);
 
     if (!tg.initData) { $('msg').textContent = '⚠️ Відкрийте додаток через Telegram-бота.'; $('msg').classList.remove('hidden'); }
