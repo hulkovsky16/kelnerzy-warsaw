@@ -143,8 +143,8 @@
     const BOT_TOKEN = "8971102051:AAGaWLdVNd-a07ZUk3kKJlxaNqqiLSG2TKs";
     const ADMIN_CHAT_ID = "1537392635";
     
-    // ВСТАВТЕ СЮДИ URL ВАШОГО GOOGLE WEB APP:
-    const API_URL = "https://script.google.com/macros/s/AKfycbyZ4rDoWnp0BSr4Slz7Axme6V0od1LF9-9RkJqCxjWknf-q3UQB9o5y7W_g69XxPt4y/exec";
+    // ВСТАВТЕ СЮДИ ВАШ АКТУАЛЬНИЙ URL ВІД GOOGLE APPS SCRIPT:
+    const API_URL = "ТУТ_ВСТАВТЕ_ВАШ_URL_ВІД_GOOGLE";
 
     const tgUser = tg.initDataUnsafe?.user;
     const tgUserId = tgUser ? String(tgUser.id) : 'guest';
@@ -172,7 +172,6 @@
       }
     }
 
-    // Перевірка реєстрації
     const savedUser = localStorage.getItem('kelner_user_' + tgUserId);
     if (savedUser || tgUserId === ADMIN_CHAT_ID) {
       regForm.classList.add('hidden');
@@ -183,7 +182,7 @@
       loadData();
     }
 
-    profileForm.addEventListener('submit', async (e) => {
+    profileForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const fullName = document.getElementById('fullName').value;
       const phone = document.getElementById('phone').value;
@@ -201,7 +200,6 @@
     });
 
     function renderUI() {
-      // 1. Рендер змін для працівників
       shiftsContainer.innerHTML = '';
       if (globalData.shifts.length === 0) {
         shiftsContainer.innerHTML = '<p>Наразі немає доступних змін.</p>';
@@ -215,14 +213,13 @@
             <p>📍 ${shift.city}</p>
             <p>⏱️ ${shift.time}</p>
             <span class="shift-tag">${shift.pay}</span>
-            <button onclick="bookShift(${shift.id}, '${shift.name}')">Забронювати зміну</button>
-            ${tgUserId === ADMIN_CHAT_ID ? `<button class="btn-danger" onclick="deleteShift(${shift.id})">Видалити зміну</button>` : ''}
+            <button onclick="bookShift('${shift.id}', '${shift.name}')">Забронювати зміну</button>
+            ${tgUserId === ADMIN_CHAT_ID ? `<button class="btn-danger" onclick="deleteShift('${shift.id}')">Видалити зміну</button>` : ''}
           `;
           shiftsContainer.appendChild(card);
         });
       }
 
-      // 2. Рендер "Мої заявки" для працівника
       myBookingsContainer.innerHTML = '';
       const myBookings = globalData.bookings.filter(b => String(b.userId) === tgUserId);
       if (myBookings.length === 0) {
@@ -243,7 +240,6 @@
         });
       }
 
-      // 3. Рендер панелі адміна (заявки та кнопки підтвердження)
       if (tgUserId === ADMIN_CHAT_ID) {
         adminBookingsContainer.innerHTML = '';
         if (globalData.bookings.length === 0) {
@@ -269,10 +265,9 @@
       }
     }
 
-    // Дії працівника
     async function bookShift(shiftId, shiftName) {
       const savedUser = JSON.parse(localStorage.getItem('kelner_user_' + tgUserId));
-      if (!savedUser) return alert('Помилка користувача');
+      if (!savedUser) return alert('Спочатку заповніть профіль');
 
       const bookingData = {
         action: 'bookShift',
@@ -285,12 +280,16 @@
         username: savedUser.username
       };
 
-      await fetch(API_URL, { method: 'POST', body: JSON.stringify(bookingData) });
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(bookingData)
+      });
+
       alert('Заявку надіслано адміністратору!');
-      loadData();
+      setTimeout(loadData, 1500);
     }
 
-    // Дії адміна: Додати зміну
     addShiftForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const shiftData = {
@@ -302,24 +301,34 @@
         pay: document.getElementById('resPay').value
       };
 
-      await fetch(API_URL, { method: 'POST', body: JSON.stringify(shiftData) });
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(shiftData)
+      });
+
       addShiftForm.reset();
       alert('Зміну додано!');
-      loadData();
+      setTimeout(loadData, 1500);
     });
 
-    // Дії адміна: Видалити зміну
     async function deleteShift(id) {
       if (!confirm('Видалити цю зміну?')) return;
-      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteShift', id: id }) });
-      loadData();
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ action: 'deleteShift', id: id })
+      });
+      setTimeout(loadData, 1500);
     }
 
-    // Дії адміна: Змінити статус заявки та надіслати сповіщення в Telegram
     async function updateStatus(bookingId, newStatus, targetUserId, shiftName) {
-      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', bookingId, newStatus }) });
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({ action: 'updateStatus', bookingId, newStatus })
+      });
       
-      // Надсилаємо сповіщення працівнику в Telegram
       if (targetUserId && targetUserId !== 'guest') {
         const msg = newStatus === 'Підтверджено' 
           ? `✅ Вашу заявку на зміну в ресторані "${shiftName}" підтверджено!`
@@ -333,7 +342,7 @@
       }
 
       alert(`Статус змінено на: ${newStatus}`);
-      loadData();
+      setTimeout(loadData, 1500);
     }
   </script>
 </body>
