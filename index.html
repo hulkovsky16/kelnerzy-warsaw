@@ -42,13 +42,11 @@
       border-radius: 8px;
       font-size: 16px;
       font-weight: bold;
-      margin-top: 16px;
+      margin-top: 12px;
       cursor: pointer;
     }
-    .btn-danger {
-      background-color: #ef4444;
-      margin-top: 8px;
-    }
+    .btn-danger { background-color: #ef4444; }
+    .btn-success { background-color: #10b981; }
     .hidden { display: none; }
     .shift-tag {
       display: inline-block;
@@ -60,11 +58,22 @@
       font-weight: bold;
       margin-top: 6px;
     }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+    .status-pending { background: #fef3c7; color: #d97706; }
+    .status-confirmed { background: #d1fae5; color: #059669; }
+    .status-rejected { background: #fee2e2; color: #dc2626; }
   </style>
 </head>
 <body>
 
-  <!-- СЕКЦІЯ РЕЄСТРАЦІЇ -->
+  <!-- АНКЕТА РЕЄСТРАЦІЇ -->
   <div id="registration-form" class="card">
     <h2>Анкета офіціанта</h2>
     <form id="profileForm">
@@ -83,41 +92,48 @@
         <option value="Гданськ">Гданськ</option>
       </select>
 
-      <button type="submit" id="submitBtn">Зберегти та дивитися зміни</button>
+      <button type="submit" id="submitBtn">Зберегти та продовжити</button>
     </form>
   </div>
 
-  <!-- СЕКЦІЯ ЗМІН -->
-  <div id="shifts-list" class="card hidden">
-    <h3>Доступні підробітки</h3>
+  <!-- ОСНОВНИЙ ДОДАТОК -->
+  <div id="app-content" class="hidden">
 
-    <!-- Панель адміністратора (видно лише вам) -->
+    <!-- ПАНЕЛЬ АДМІНІСТРАТОРА -->
     <div id="admin-panel" class="card hidden" style="border: 2px dashed #0088cc; background: #f0f9ff;">
       <h3>⚙️ Панель адміністратора</h3>
+      
       <form id="addShiftForm">
-        <label for="resName">Назва ресторану</label>
+        <h4>Додати нову зміну</h4>
+        <label>Ресторан</label>
         <input type="text" id="resName" placeholder="Grand Cafe" required>
-
-        <label for="resCity">Місто</label>
+        <label>Місто</label>
         <select id="resCity" required>
           <option value="Варшава">Варшава</option>
           <option value="Краків">Краків</option>
           <option value="Вроцлав">Вроцлав</option>
           <option value="Гданськ">Гданськ</option>
         </select>
-
-        <label for="resTime">Час та дата</label>
+        <label>Час та дата</label>
         <input type="text" id="resTime" placeholder="Завтра, 14:00 - 22:00" required>
-
-        <label for="resPay">Оплата</label>
+        <label>Оплата</label>
         <input type="text" id="resPay" placeholder="35 злотих/год" required>
-
-        <button type="submit">Додати зміну</button>
+        <button type="submit">Створити зміну</button>
       </form>
+
+      <h4 style="margin-top: 24px;">📋 Заявки працівників</h4>
+      <div id="admin-bookings-container">Завантаження заявок...</div>
     </div>
-    
-    <!-- Контейнер для списку змін -->
-    <div id="shifts-container"></div>
+
+    <!-- КАТАЛОГ ЗМІН ДЛЯ ПРАЦІВНИКІВ -->
+    <div id="employee-view">
+      <h3>Доступні підробітки</h3>
+      <div id="shifts-container">Завантаження змін...</div>
+
+      <h3 style="margin-top: 24px;">Мої заявки</h3>
+      <div id="my-bookings-container">У вас немає активних заявок.</div>
+    </div>
+
   </div>
 
   <script>
@@ -126,120 +142,198 @@
 
     const BOT_TOKEN = "8971102051:AAGaWLdVNd-a07ZUk3kKJlxaNqqiLSG2TKs";
     const ADMIN_CHAT_ID = "1537392635";
+    
+    // ВСТАВТЕ СЮДИ URL ВАШОГО GOOGLE WEB APP:
+    const API_URL = "https://script.google.com/macros/s/AKfycbyZ4rDoWnp0BSr4Slz7Axme6V0od1LF9-9RkJqCxjWknf-q3UQB9o5y7W_g69XxPt4y/exec";
 
     const tgUser = tg.initDataUnsafe?.user;
     const tgUserId = tgUser ? String(tgUser.id) : 'guest';
     const tgUsername = tgUser ? `@${tgUser.username}` : 'немає юзернейму';
 
     const regForm = document.getElementById('registration-form');
-    const shiftsList = document.getElementById('shifts-list');
+    const appContent = document.getElementById('app-content');
     const adminPanel = document.getElementById('admin-panel');
-    const form = document.getElementById('profileForm');
+    const profileForm = document.getElementById('profileForm');
     const addShiftForm = document.getElementById('addShiftForm');
+    
     const shiftsContainer = document.getElementById('shifts-container');
+    const myBookingsContainer = document.getElementById('my-bookings-container');
+    const adminBookingsContainer = document.getElementById('admin-bookings-container');
 
-    // Початкові зміни (якщо ще нічого не додано)
-    const defaultShifts = [
-      { id: 1, name: "Grand Cafe", city: "Варшава", time: "Завтра, 14:00 - 22:00 (8 годин)", pay: "35 злотих/год" }
-    ];
+    let globalData = { shifts: [], bookings: [] };
 
-    function getShifts() {
-      const stored = localStorage.getItem('kelner_shifts');
-      return stored ? JSON.parse(stored) : defaultShifts;
-    }
-
-    function renderShifts() {
-      const shifts = getShifts();
-      shiftsContainer.innerHTML = '';
-
-      shifts.forEach(shift => {
-        const shiftCard = document.createElement('div');
-        shiftCard.className = 'card';
-        shiftCard.style.border = '1px solid #eee';
-        shiftCard.innerHTML = `
-          <h4>Ресторан "${shift.name}"</h4>
-          <p>📍 ${shift.city}</p>
-          <p>⏱️ ${shift.time}</p>
-          <span class="shift-tag">${shift.pay}</span>
-          <button onclick="takeShift('${shift.name}')">Забронювати зміну</button>
-          ${tgUserId === ADMIN_CHAT_ID ? `<button class="btn-danger" onclick="deleteShift(${shift.id})">Видалити зміну</button>` : ''}
-        `;
-        shiftsContainer.appendChild(shiftCard);
-      });
+    async function loadData() {
+      try {
+        const response = await fetch(API_URL);
+        globalData = await response.json();
+        renderUI();
+      } catch (err) {
+        console.error("Помилка завантаження даних", err);
+      }
     }
 
     // Перевірка реєстрації
     const savedUser = localStorage.getItem('kelner_user_' + tgUserId);
-    if (savedUser) {
+    if (savedUser || tgUserId === ADMIN_CHAT_ID) {
       regForm.classList.add('hidden');
-      shiftsList.classList.remove('hidden');
-      renderShifts();
+      appContent.classList.remove('hidden');
+      if (tgUserId === ADMIN_CHAT_ID) {
+        adminPanel.classList.remove('hidden');
+      }
+      loadData();
     }
 
-    // Показуємо панель адміна, якщо це ваш ID
-    if (tgUserId === ADMIN_CHAT_ID) {
-      adminPanel.classList.remove('hidden');
-    }
-
-    form.addEventListener('submit', async (e) => {
+    profileForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const btn = document.getElementById('submitBtn');
-      btn.innerText = "Надсилання...";
-      btn.disabled = true;
-
       const fullName = document.getElementById('fullName').value;
       const phone = document.getElementById('phone').value;
       const city = document.getElementById('city').value;
 
       const userData = { fullName, phone, city, tgUsername };
-      const text = `📥 **Нова анкета офіціанта!**\n\n👤 **ПІБ:** ${fullName}\n📞 **Телефон:** ${phone}\n🏙️ **Місто:** ${city}\n💬 **Telegram:** ${tgUsername}`;
+      localStorage.setItem('kelner_user_' + tgUserId, JSON.stringify(userData));
 
-      try {
+      regForm.classList.add('hidden');
+      appContent.classList.remove('hidden');
+      if (tgUserId === ADMIN_CHAT_ID) {
+        adminPanel.classList.remove('hidden');
+      }
+      loadData();
+    });
+
+    function renderUI() {
+      // 1. Рендер змін для працівників
+      shiftsContainer.innerHTML = '';
+      if (globalData.shifts.length === 0) {
+        shiftsContainer.innerHTML = '<p>Наразі немає доступних змін.</p>';
+      } else {
+        globalData.shifts.forEach(shift => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.style.border = '1px solid #eee';
+          card.innerHTML = `
+            <h4>Ресторан "${shift.name}"</h4>
+            <p>📍 ${shift.city}</p>
+            <p>⏱️ ${shift.time}</p>
+            <span class="shift-tag">${shift.pay}</span>
+            <button onclick="bookShift(${shift.id}, '${shift.name}')">Забронювати зміну</button>
+            ${tgUserId === ADMIN_CHAT_ID ? `<button class="btn-danger" onclick="deleteShift(${shift.id})">Видалити зміну</button>` : ''}
+          `;
+          shiftsContainer.appendChild(card);
+        });
+      }
+
+      // 2. Рендер "Мої заявки" для працівника
+      myBookingsContainer.innerHTML = '';
+      const myBookings = globalData.bookings.filter(b => String(b.userId) === tgUserId);
+      if (myBookings.length === 0) {
+        myBookingsContainer.innerHTML = '<p>Ви ще не бронювали зміни.</p>';
+      } else {
+        myBookings.forEach(b => {
+          let badgeClass = 'status-pending';
+          if (b.status === 'Підтверджено') badgeClass = 'status-confirmed';
+          if (b.status === 'Відхилено') badgeClass = 'status-rejected';
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <h4>${b.shiftName}</h4>
+            <p>Статус заявки: <span class="status-badge ${badgeClass}">${b.status}</span></p>
+          `;
+          myBookingsContainer.appendChild(card);
+        });
+      }
+
+      // 3. Рендер панелі адміна (заявки та кнопки підтвердження)
+      if (tgUserId === ADMIN_CHAT_ID) {
+        adminBookingsContainer.innerHTML = '';
+        if (globalData.bookings.length === 0) {
+          adminBookingsContainer.innerHTML = '<p>Поки немає жодної заявки.</p>';
+        } else {
+          globalData.bookings.forEach(b => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.background = '#fff';
+            card.innerHTML = `
+              <p><b>Зміна:</b> ${b.shiftName}</p>
+              <p>👤 <b>Працівник:</b> ${b.fullName} (${b.username})</p>
+              <p>📞 <b>Телефон:</b> ${b.phone}</p>
+              <p>Статус: <b>${b.status}</b></p>
+              ${b.status === 'Очікує' ? `
+                <button class="btn-success" onclick="updateStatus('${b.id}', 'Підтверджено', '${b.userId}', '${b.shiftName}')">Підтвердити</button>
+                <button class="btn-danger" onclick="updateStatus('${b.id}', 'Відхилено', '${b.userId}', '${b.shiftName}')">Відхилити</button>
+              ` : ''}
+            `;
+            adminBookingsContainer.appendChild(card);
+          });
+        }
+      }
+    }
+
+    // Дії працівника
+    async function bookShift(shiftId, shiftName) {
+      const savedUser = JSON.parse(localStorage.getItem('kelner_user_' + tgUserId));
+      if (!savedUser) return alert('Помилка користувача');
+
+      const bookingData = {
+        action: 'bookShift',
+        id: 'b_' + Date.now(),
+        shiftId: shiftId,
+        shiftName: shiftName,
+        userId: tgUserId,
+        fullName: savedUser.fullName,
+        phone: savedUser.phone,
+        username: savedUser.username
+      };
+
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify(bookingData) });
+      alert('Заявку надіслано адміністратору!');
+      loadData();
+    }
+
+    // Дії адміна: Додати зміну
+    addShiftForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const shiftData = {
+        action: 'addShift',
+        id: Date.now(),
+        name: document.getElementById('resName').value,
+        city: document.getElementById('resCity').value,
+        time: document.getElementById('resTime').value,
+        pay: document.getElementById('resPay').value
+      };
+
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify(shiftData) });
+      addShiftForm.reset();
+      alert('Зміну додано!');
+      loadData();
+    });
+
+    // Дії адміна: Видалити зміну
+    async function deleteShift(id) {
+      if (!confirm('Видалити цю зміну?')) return;
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteShift', id: id }) });
+      loadData();
+    }
+
+    // Дії адміна: Змінити статус заявки та надіслати сповіщення в Telegram
+    async function updateStatus(bookingId, newStatus, targetUserId, shiftName) {
+      await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', bookingId, newStatus }) });
+      
+      // Надсилаємо сповіщення працівнику в Telegram
+      if (targetUserId && targetUserId !== 'guest') {
+        const msg = newStatus === 'Підтверджено' 
+          ? `✅ Вашу заявку на зміну в ресторані "${shiftName}" підтверджено!`
+          : `❌ На жаль, вашу заявку на зміну в ресторані "${shiftName}" відхилено.`;
+
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: text, parse_mode: 'Markdown' })
+          body: JSON.stringify({ chat_id: targetUserId, text: msg })
         });
-
-        localStorage.setItem('kelner_user_' + tgUserId, JSON.stringify(userData));
-        regForm.classList.add('hidden');
-        shiftsList.classList.remove('hidden');
-        renderShifts();
-      } catch (error) {
-        alert("Помилка надсилання. Спробуйте ще раз.");
-        btn.innerText = "Зберегти та дивитися зміни";
-        btn.disabled = false;
       }
-    });
 
-    // Додавання нової зміни адміністратором
-    addShiftForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('resName').value;
-      const city = document.getElementById('resCity').value;
-      const time = document.getElementById('resTime').value;
-      const pay = document.getElementById('resPay').value;
-
-      const shifts = getShifts();
-      const newShift = { id: Date.now(), name, city, time, pay };
-      shifts.push(newShift);
-      
-      localStorage.setItem('kelner_shifts', JSON.stringify(shifts));
-      addShiftForm.reset();
-      renderShifts();
-      alert("Зміну успішно додано!");
-    });
-
-    function deleteShift(id) {
-      let shifts = getShifts();
-      shifts = shifts.filter(s => s.id !== id);
-      localStorage.setItem('kelner_shifts', JSON.stringify(shifts));
-      renderShifts();
-    }
-
-    function takeShift(restaurant) {
-      alert(`Ви відгукнулися на зміну в ${restaurant}! Менеджер зв'яжеться з вами.`);
+      alert(`Статус змінено на: ${newStatus}`);
+      loadData();
     }
   </script>
 </body>
