@@ -10,13 +10,15 @@
     :root { --gold:#d4a514; --gold-d:#8f6b05; --ink:#2a2412; --bg:#fffdf7; --line:#ecdba6; --soft:#fbf3d9;
       --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif; }
     * { box-sizing: border-box; }
-    body { margin:0; padding:16px 16px 40px; background:var(--bg); color:var(--ink);
+    body { margin:0; padding:12px 16px 40px; background:var(--bg); color:var(--ink);
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; }
     h2,h3,h4 { font-family:var(--serif); margin:0 0 8px; }
     h2 { font-size:30px; } h3 { font-size:25px; } h4 { font-size:21px; }
     p { margin:6px 0; }
     a { color:var(--gold-d); }
     .hidden { display:none !important; }
+    .lang { display:flex; justify-content:flex-end; margin-bottom:4px; }
+    .lang select { width:auto; margin:0; padding:4px 10px; font-size:13px; border-radius:999px; background:var(--soft); }
     .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:12px; }
     .card.admin { border:2px dashed var(--gold); }
     label { display:block; margin-top:10px; font-weight:600; font-size:14px; }
@@ -31,8 +33,7 @@
     .tag, .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; margin-top:6px; }
     .tag { background:var(--soft); color:var(--gold-d); }
     .wait { background:#fef3c7; color:#92400e; } .yes { background:#d1fae5; color:#047857; } .no { background:#fee2e2; color:#b91c1c; }
-
-    .brand { text-align:center; color:var(--gold); padding:8px 0 4px; }
+    .brand { text-align:center; color:var(--gold); padding:4px 0; }
     .brand svg { width:128px; height:128px; }
     .brand .wm { font-family:var(--serif); font-size:48px; font-weight:700; line-height:1; color:var(--gold-d); }
     .brand .sub { font-family:var(--serif); font-size:18px; color:var(--gold-d); }
@@ -55,9 +56,9 @@
     <symbol id="star" viewBox="0 0 24 24"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z"/></symbol>
   </svg>
 
-  <div id="msg" class="card">Завантаження…</div>
+  <div class="lang"><select id="lang" aria-label="Language"></select></div>
+  <div id="msg" class="card"></div>
 
-  <!-- ГОЛОВНЕ МЕНЮ -->
   <section id="v-home" class="view hidden">
     <div class="brand">
       <svg viewBox="0 0 120 120" aria-hidden="true">
@@ -73,85 +74,77 @@
 
     <button class="menu" data-go="shifts">
       <span class="ring"><svg class="ic"><use href="#star"/></svg></span>
-      <span class="mt"><b>Доступні підробітки</b><small id="s1"></small></span><span class="chev">›</span>
+      <span class="mt"><b data-i18n="m1"></b><small id="s1"></small></span><span class="chev">›</span>
     </button>
     <button class="menu" id="mn-mine" data-go="mine">
       <span class="ring"><svg class="ic"><use href="#star"/></svg></span>
-      <span class="mt"><b>Мої зміни</b><small id="s2"></small></span><span class="chev">›</span>
+      <span class="mt"><b data-i18n="m2"></b><small id="s2"></small></span><span class="chev">›</span>
     </button>
     <button class="menu hidden" id="mn-admin" data-go="admin">
       <span class="ring"><svg class="ic"><use href="#star"/></svg></span>
-      <span class="mt"><b>Панель адміністратора</b><small id="s4"></small></span><span class="chev">›</span>
+      <span class="mt"><b data-i18n="m3"></b><small id="s4"></small></span><span class="chev">›</span>
     </button>
     <button class="menu" data-go="contacts">
       <span class="ring"><svg class="ic"><use href="#star"/></svg></span>
-      <span class="mt"><b>Зв'язатись з нами</b><small>Адміністратори та телефони</small></span><span class="chev">›</span>
+      <span class="mt"><b data-i18n="m4"></b><small data-i18n="m4s"></small></span><span class="chev">›</span>
     </button>
   </section>
 
-  <!-- АНКЕТА -->
   <section id="v-reg" class="view hidden">
     <div class="card">
-      <h2>Анкета офіціанта</h2>
+      <h2 data-i18n="regT"></h2>
       <form id="profileForm">
-        <label for="fullName">Ім'я та Прізвище</label>
-        <input type="text" id="fullName" placeholder="Олександр Іванов" maxlength="80" required>
-        <label for="phone">Номер телефону</label>
+        <label for="fullName" data-i18n="fName"></label>
+        <input type="text" id="fullName" maxlength="80" required>
+        <label for="phone" data-i18n="fPhone"></label>
         <input type="tel" id="phone" placeholder="+48 123 456 789" maxlength="30" required>
-        <label for="city">Місто</label>
-        <select id="city" required>
-          <option value="" disabled selected>Оберіть місто</option>
-          <option>Варшава</option><option>Краків</option><option>Вроцлав</option><option>Гданськ</option><option>Познань</option>
-        </select>
-        <button type="submit" class="btn">Зберегти та продовжити</button>
+        <label for="city" data-i18n="fCity"></label>
+        <select id="city" required></select>
+        <button type="submit" class="btn" data-i18n="regBtn"></button>
       </form>
     </div>
   </section>
 
-  <!-- ДОСТУПНІ ПІДРОБІТКИ -->
   <section id="v-shifts" class="view hidden">
-    <button class="back" data-go="home">‹ Меню</button>
-    <h3>Доступні підробітки</h3>
+    <button class="back" data-go="home" data-i18n="back"></button>
+    <h3 data-i18n="m1"></h3>
     <div id="shifts"></div>
   </section>
 
-  <!-- МОЇ ЗМІНИ -->
   <section id="v-mine" class="view hidden">
-    <button class="back" data-go="home">‹ Меню</button>
-    <h3>Майбутні зміни</h3>
+    <button class="back" data-go="home" data-i18n="back"></button>
+    <h3 data-i18n="upT"></h3>
     <div id="upcoming"></div>
-    <h3 style="margin-top:24px">Відпрацьовано цього місяця</h3>
+    <h3 style="margin-top:24px" data-i18n="doneT"></h3>
     <div id="done"></div>
   </section>
 
-  <!-- КОНТАКТИ -->
   <section id="v-contacts" class="view hidden">
-    <button class="back" data-go="home">‹ Меню</button>
-    <h3>Зв'язатись з нами</h3>
+    <button class="back" data-go="home" data-i18n="back"></button>
+    <h3 data-i18n="m4"></h3>
     <div id="contacts"></div>
   </section>
 
-  <!-- АДМІН-ПАНЕЛЬ -->
   <section id="v-admin" class="view hidden">
-    <button class="back" data-go="home">‹ Меню</button>
+    <button class="back" data-go="home" data-i18n="back"></button>
     <div class="card admin">
-      <h3>Нова зміна</h3>
+      <h3 data-i18n="newT"></h3>
       <form id="addShiftForm">
-        <label>Місто</label>
+        <label data-i18n="fCity"></label>
         <select id="resCity" required></select>
-        <label>Готель / ресторан</label>
+        <label data-i18n="fHotel"></label>
         <select id="resHotel" required></select>
-        <input type="text" id="resName" class="hidden" placeholder="Назва закладу" maxlength="80">
-        <label>Дата</label>
+        <input type="text" id="resName" class="hidden" maxlength="80">
+        <label data-i18n="fDate"></label>
         <input type="date" id="resDate" required>
-        <label>Години</label>
+        <label data-i18n="fHours"></label>
         <input type="text" id="resTime" placeholder="14:00 - 22:00" maxlength="80" required>
-        <label>Оплата</label>
-        <input type="text" id="resPay" placeholder="35 злотих/год" maxlength="80" required>
-        <button type="submit" class="btn">Створити зміну</button>
+        <label data-i18n="fPay"></label>
+        <input type="text" id="resPay" placeholder="35 PLN/h" maxlength="80" required>
+        <button type="submit" class="btn" data-i18n="createBtn"></button>
       </form>
     </div>
-    <h3>Заявки працівників</h3>
+    <h3 data-i18n="reqT"></h3>
     <div id="adminBookings"></div>
   </section>
 
@@ -169,8 +162,92 @@
       { name: 'Адміністратор', username: '@username2', phone: '+48 000 000 001' }
     ];
 
+    // ✏️ Назви готелів
+    const MANUAL = '__manual__';
+    const HOTELS = {
+      'Варшава': ['Intercontinental', 'HolidayInn', 'Gromada', 'Boss'],
+      'Краків': ['Copernicus', 'Hotel Stary', 'Grand Hotel Kraków'],
+      'Вроцлав': ['The Bridge', 'Monopol', 'Altus Palace'],
+      'Гданськ': ['Radisson Blu', 'Hilton', 'Boutique'],
+      'Познань': ['City Park Hotel & Residence', 'Blow Up Hall', 'Sheraton']
+    };
+
+    // Переклади: [укр, пол, рос, англ]. Ключі-назви міст і статусів = значення в таблиці.
+    const LANGS = { uk: ['Українська', 'uk-UA'], pl: ['Polski', 'pl-PL'], ru: ['Русский', 'ru-RU'], en: ['English', 'en-GB'] };
+    const IDX = { uk: 0, pl: 1, ru: 2, en: 3 };
+    const D = {
+      loading: ['Завантаження…', 'Ładowanie…', 'Загрузка…', 'Loading…'],
+      openTg: ['Відкрийте додаток через Telegram-бота.', 'Otwórz aplikację przez bota w Telegramie.', 'Откройте приложение через Telegram-бота.', 'Open the app via the Telegram bot.'],
+      hello: ['Вітаємо, {0}!', 'Witaj, {0}!', 'Добро пожаловать, {0}!', 'Welcome, {0}!'],
+      hello0: ['Вітаємо!', 'Witaj!', 'Добро пожаловать!', 'Welcome!'],
+      m1: ['Доступні підробітки', 'Dostępne zlecenia', 'Доступные подработки', 'Available shifts'],
+      m2: ['Мої зміни', 'Moje zmiany', 'Мои смены', 'My shifts'],
+      m3: ['Панель адміністратора', 'Panel administratora', 'Панель администратора', 'Admin panel'],
+      m4: ["Зв'язатись з нами", 'Skontaktuj się z nami', 'Связаться с нами', 'Contact us'],
+      m4s: ['Адміністратори та телефони', 'Administratorzy i telefony', 'Администраторы и телефоны', 'Admins and phone numbers'],
+      s1: ['Актуальних пропозицій: {0}', 'Aktualne oferty: {0}', 'Актуальных предложений: {0}', 'Open offers: {0}'],
+      s2: ['Майбутніх: {0} · Відпрацьовано за місяць: {1}', 'Nadchodzące: {0} · Przepracowane w tym miesiącu: {1}', 'Предстоящих: {0} · Отработано за месяц: {1}', 'Upcoming: {0} · Worked this month: {1}'],
+      s4: ['Заявок на розгляді: {0}', 'Wnioski do rozpatrzenia: {0}', 'Заявок на рассмотрении: {0}', 'Pending requests: {0}'],
+      back: ['‹ Меню', '‹ Menu', '‹ Меню', '‹ Menu'],
+      regT: ['Анкета офіціанта', 'Ankieta kelnera', 'Анкета официанта', 'Waiter profile'],
+      fName: ["Ім'я та Прізвище", 'Imię i nazwisko', 'Имя и фамилия', 'Full name'],
+      fPhone: ['Номер телефону', 'Numer telefonu', 'Номер телефона', 'Phone number'],
+      fCity: ['Місто', 'Miasto', 'Город', 'City'],
+      pickCity: ['Оберіть місто', 'Wybierz miasto', 'Выберите город', 'Select a city'],
+      regBtn: ['Зберегти та продовжити', 'Zapisz i kontynuuj', 'Сохранить и продолжить', 'Save and continue'],
+      none: ['Наразі немає доступних змін.', 'Obecnie brak dostępnych zmian.', 'Сейчас нет доступных смен.', 'No shifts available right now.'],
+      tbc: ['Дату уточнюйте', 'Data do ustalenia', 'Дату уточняйте', 'Date TBC'],
+      del: ['Видалити зміну', 'Usuń zmianę', 'Удалить смену', 'Delete shift'],
+      sent: ['Заявку подано', 'Wniosek wysłany', 'Заявка подана', 'Request sent'],
+      book: ['Забронювати зміну', 'Zarezerwuj zmianę', 'Забронировать смену', 'Book shift'],
+      upT: ['Майбутні зміни', 'Nadchodzące zmiany', 'Предстоящие смены', 'Upcoming shifts'],
+      doneT: ['Відпрацьовано цього місяця', 'Przepracowane w tym miesiącu', 'Отработано в этом месяце', 'Worked this month'],
+      noUp: ['Майбутніх змін поки немає.', 'Brak nadchodzących zmian.', 'Предстоящих смен пока нет.', 'No upcoming shifts yet.'],
+      noDone: ['Цього місяця відпрацьованих змін ще немає.', 'W tym miesiącu nie ma jeszcze przepracowanych zmian.', 'В этом месяце отработанных смен ещё нет.', 'No shifts worked this month yet.'],
+      tgBtn: ['Написати в Telegram', 'Napisz na Telegramie', 'Написать в Telegram', 'Message on Telegram'],
+      newT: ['Нова зміна', 'Nowa zmiana', 'Новая смена', 'New shift'],
+      fHotel: ['Готель / ресторан', 'Hotel / restauracja', 'Отель / ресторан', 'Hotel / restaurant'],
+      manual: ['✍️ Інший (вручну)', '✍️ Inny (ręcznie)', '✍️ Другой (вручную)', '✍️ Other (manual)'],
+      fDate: ['Дата', 'Data', 'Дата', 'Date'],
+      fHours: ['Години', 'Godziny', 'Часы', 'Hours'],
+      fPay: ['Оплата', 'Wynagrodzenie', 'Оплата', 'Pay'],
+      createBtn: ['Створити зміну', 'Utwórz zmianę', 'Создать смену', 'Create shift'],
+      reqT: ['Заявки працівників', 'Wnioski pracowników', 'Заявки сотрудников', 'Staff requests'],
+      lShift: ['Зміна:', 'Zmiana:', 'Смена:', 'Shift:'],
+      lEmp: ['Працівник:', 'Pracownik:', 'Сотрудник:', 'Employee:'],
+      lPhone: ['Телефон:', 'Telefon:', 'Телефон:', 'Phone:'],
+      lStatus: ['Статус:', 'Status:', 'Статус:', 'Status:'],
+      noReq: ['Поки немає жодної заявки.', 'Brak wniosków.', 'Заявок пока нет.', 'No requests yet.'],
+      ok: ['Підтвердити', 'Zatwierdź', 'Подтвердить', 'Confirm'],
+      no: ['Відхилити', 'Odrzuć', 'Отклонить', 'Reject'],
+      'Очікує': ['Очікує', 'Oczekuje', 'Ожидает', 'Pending'],
+      'Підтверджено': ['Підтверджено', 'Potwierdzono', 'Подтверждено', 'Confirmed'],
+      'Відхилено': ['Відхилено', 'Odrzucono', 'Отклонено', 'Rejected'],
+      'Варшава': ['Варшава', 'Warszawa', 'Варшава', 'Warsaw'],
+      'Краків': ['Краків', 'Kraków', 'Краков', 'Kraków'],
+      'Вроцлав': ['Вроцлав', 'Wrocław', 'Вроцлав', 'Wrocław'],
+      'Гданськ': ['Гданськ', 'Gdańsk', 'Гданьск', 'Gdańsk'],
+      'Познань': ['Познань', 'Poznań', 'Познань', 'Poznań'],
+      added: ['Зміну додано!', 'Zmiana dodana!', 'Смена добавлена!', 'Shift added!'],
+      reqSent: ['Заявку надіслано адміністратору!', 'Wniosek wysłany do administratora!', 'Заявка отправлена администратору!', 'Request sent to the admin!'],
+      delQ: ['Видалити цю зміну?', 'Usunąć tę zmianę?', 'Удалить эту смену?', 'Delete this shift?'],
+      err: ['Помилка: ', 'Błąd: ', 'Ошибка: ', 'Error: '],
+      fillFirst: ['Спочатку заповніть анкету', 'Najpierw wypełnij ankietę', 'Сначала заполните анкету', 'Please fill in your profile first'],
+      stOk: ['Статус: {0}. Працівника сповіщено.', 'Status: {0}. Pracownik powiadomiony.', 'Статус: {0}. Сотрудник уведомлён.', 'Status: {0}. Employee notified.'],
+      stNo: ['Статус: {0}. ⚠️ Сповіщення не доставлено — працівник ще не запускав бота (/start).', 'Status: {0}. ⚠️ Powiadomienie nie dotarło — pracownik nie uruchomił bota (/start).', 'Статус: {0}. ⚠️ Уведомление не доставлено — сотрудник ещё не запускал бота (/start).', "Status: {0}. ⚠️ Notification not delivered — the employee hasn't started the bot (/start)."]
+    };
+
+    let lang = localStorage.getItem('kelner_lang') || (tg.initDataUnsafe?.user?.language_code || 'uk').slice(0, 2);
+    if (!LANGS[lang]) lang = 'uk';
+    const t = (k, ...a) => {
+      let s = D[k] ? D[k][IDX[lang]] : k;
+      a.forEach((x, i) => { s = s.replace('{' + i + '}', () => x); });
+      return s;
+    };
+
     const $ = id => document.getElementById(id);
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const opt = (v, txt) => `<option value="${esc(v)}">${esc(txt ?? v)}</option>`;
     const LS_KEY = 'kelner_user_' + (tg.initDataUnsafe?.user?.id ?? 'guest');
     const profile = () => { try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; } };
     const statusCls = s => ({ 'Підтверджено': 'yes', 'Відхилено': 'no' }[s] || 'wait');
@@ -179,9 +256,9 @@
     const fmtDate = s => {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(s || '')) return '';
       const [y, m, d] = s.split('-').map(Number);
-      return new Date(y, m - 1, d).toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' });
+      return new Date(y, m - 1, d).toLocaleDateString(LANGS[lang][1], { weekday: 'short', day: 'numeric', month: 'long' });
     };
-    const when = (d, t) => [fmtDate(d), t].filter(Boolean).join(' · ');
+    const when = (d, tm) => [fmtDate(d), tm].filter(Boolean).join(' · ');
     const byDate = (k, dir = 1) => (a, b) => dir * String(a[k] || '9999').localeCompare(String(b[k] || '9999'));
 
     let state = { role: null, shifts: [], bookings: [] };
@@ -216,96 +293,113 @@
     tg.BackButton?.onClick(() => go('home'));
 
     function mineSplit() {
-      const t = today(), ok = state.bookings.filter(b => b.status !== 'Відхилено');
+      const td = today(), okb = state.bookings.filter(b => b.status !== 'Відхилено');
       return {
-        up: ok.filter(b => !b.shiftDate || b.shiftDate >= t).sort(byDate('shiftDate')),
-        done: ok.filter(b => b.status === 'Підтверджено' && b.shiftDate && b.shiftDate < t
-          && b.shiftDate.slice(0, 7) === t.slice(0, 7)).sort(byDate('shiftDate', -1))
+        up: okb.filter(b => !b.shiftDate || b.shiftDate >= td).sort(byDate('shiftDate')),
+        done: okb.filter(b => b.status === 'Підтверджено' && b.shiftDate && b.shiftDate < td
+          && b.shiftDate.slice(0, 7) === td.slice(0, 7)).sort(byDate('shiftDate', -1))
       };
     }
 
     const myCard = b => `
       <div class="card">
         <h4>${esc(b.shiftName)}</h4>
-        <p>🗓 ${esc(when(b.shiftDate, b.shiftTime) || 'Дату уточнюйте')}</p>
-        <span class="badge ${statusCls(b.status)}">${esc(b.status)}</span>
+        <p>🗓 ${esc(when(b.shiftDate, b.shiftTime) || t('tbc'))}</p>
+        <span class="badge ${statusCls(b.status)}">${esc(t(b.status))}</span>
       </div>`;
 
     function render() {
       if (!state.role) return;
-      const admin = state.role === 'admin', t = today();
+      const admin = state.role === 'admin', td = today();
       $('mn-mine').classList.toggle('hidden', admin);
       $('mn-admin').classList.toggle('hidden', !admin);
       const name = tg.initDataUnsafe?.user?.first_name;
-      $('hello').textContent = name ? `Вітаємо, ${name}!` : 'Вітаємо!';
+      $('hello').textContent = name ? t('hello', name) : t('hello0');
 
-      // Каталог: лише актуальні (майбутні) зміни
       const taken = new Set(state.bookings.filter(b => b.status !== 'Відхилено').map(b => b.shiftId));
-      const open = state.shifts.filter(s => !s.date || s.date >= t).sort(byDate('date'));
-      $('s1').textContent = `Актуальних пропозицій: ${open.length}`;
+      const open = state.shifts.filter(s => !s.date || s.date >= td).sort(byDate('date'));
+      $('s1').textContent = t('s1', open.length);
       $('shifts').innerHTML = open.length ? open.map(s => `
         <div class="card">
           <h4>${esc(s.name)}</h4>
-          <p>📍 ${esc(s.city)}</p>
-          <p>🗓 ${esc(when(s.date, s.time) || 'Дату уточнюйте')}</p>
+          <p>📍 ${esc(t(s.city))}</p>
+          <p>🗓 ${esc(when(s.date, s.time) || t('tbc'))}</p>
           <span class="tag">${esc(s.pay)}</span>
-          ${admin ? `<button class="btn danger" data-act="del" data-id="${esc(s.id)}">Видалити зміну</button>`
-            : taken.has(s.id) ? `<button class="btn" disabled>Заявку подано</button>`
-            : `<button class="btn" data-act="book" data-id="${esc(s.id)}">Забронювати зміну</button>`}
-        </div>`).join('') : '<p>Наразі немає доступних змін.</p>';
+          ${admin ? `<button class="btn danger" data-act="del" data-id="${esc(s.id)}">${t('del')}</button>`
+            : taken.has(s.id) ? `<button class="btn" disabled>${t('sent')}</button>`
+            : `<button class="btn" data-act="book" data-id="${esc(s.id)}">${t('book')}</button>`}
+        </div>`).join('') : `<p>${t('none')}</p>`;
 
       if (admin) {
-        $('s4').textContent = `Заявок на розгляді: ${state.bookings.filter(b => b.status === 'Очікує').length}`;
+        $('s4').textContent = t('s4', state.bookings.filter(b => b.status === 'Очікує').length);
         $('adminBookings').innerHTML = state.bookings.length ? state.bookings.slice().reverse().map(b => `
           <div class="card">
-            <p><b>Зміна:</b> ${esc(b.shiftName)}${b.shiftDate ? ' — ' + esc(when(b.shiftDate, b.shiftTime)) : ''}</p>
-            <p>👤 <b>Працівник:</b> ${esc(b.fullName)} (${esc(b.username)})</p>
-            <p>📞 <b>Телефон:</b> ${esc(b.phone)}</p>
-            <p>Статус: <span class="badge ${statusCls(b.status)}">${esc(b.status)}</span></p>
+            <p><b>${t('lShift')}</b> ${esc(b.shiftName)}${b.shiftDate ? ' — ' + esc(when(b.shiftDate, b.shiftTime)) : ''}</p>
+            <p>👤 <b>${t('lEmp')}</b> ${esc(b.fullName)} (${esc(b.username)})</p>
+            <p>📞 <b>${t('lPhone')}</b> ${esc(b.phone)}</p>
+            <p>${t('lStatus')} <span class="badge ${statusCls(b.status)}">${esc(t(b.status))}</span></p>
             ${b.status === 'Очікує' ? `
-              <button class="btn ok" data-act="st" data-id="${esc(b.id)}" data-s="Підтверджено">Підтвердити</button>
-              <button class="btn danger" data-act="st" data-id="${esc(b.id)}" data-s="Відхилено">Відхилити</button>` : ''}
-          </div>`).join('') : '<p>Поки немає жодної заявки.</p>';
+              <button class="btn ok" data-act="st" data-id="${esc(b.id)}" data-s="Підтверджено">${t('ok')}</button>
+              <button class="btn danger" data-act="st" data-id="${esc(b.id)}" data-s="Відхилено">${t('no')}</button>` : ''}
+          </div>`).join('') : `<p>${t('noReq')}</p>`;
       } else {
         const { up, done } = mineSplit();
-        $('s2').textContent = `Майбутніх: ${up.length} · Відпрацьовано за місяць: ${done.length}`;
-        $('upcoming').innerHTML = up.length ? up.map(myCard).join('') : '<p>Майбутніх змін поки немає.</p>';
-        $('done').innerHTML = done.length ? done.map(myCard).join('') : '<p>Цього місяця відпрацьованих змін ще немає.</p>';
+        $('s2').textContent = t('s2', up.length, done.length);
+        $('upcoming').innerHTML = up.length ? up.map(myCard).join('') : `<p>${t('noUp')}</p>`;
+        $('done').innerHTML = done.length ? done.map(myCard).join('') : `<p>${t('noDone')}</p>`;
       }
     }
 
-    $('contacts').innerHTML = CONTACTS.map(c => `
-      <div class="card">
-        <h4>${esc(c.name)}</h4>
-        <p>✈️ ${esc(c.username)}</p>
-        <p>📞 <a href="tel:${esc(c.phone.replace(/[^\d+]/g, ''))}">${esc(c.phone)}</a></p>
-        <button class="btn" data-act="tg" data-u="${esc(c.username.replace('@', ''))}">Написати в Telegram</button>
-      </div>`).join('');
+    function buildContacts() {
+      $('contacts').innerHTML = CONTACTS.map(c => `
+        <div class="card">
+          <h4>${esc(c.name)}</h4>
+          <p>✈️ ${esc(c.username)}</p>
+          <p>📞 <a href="tel:${esc(c.phone.replace(/[^\d+]/g, ''))}">${esc(c.phone)}</a></p>
+          <button class="btn" data-act="tg" data-u="${esc(c.username.replace('@', ''))}">${t('tgBtn')}</button>
+        </div>`).join('');
+    }
 
-    $('resDate').min = today();
-        // ✏️ Назви готелів можна редагувати тут
-    const MANUAL = '__manual__';
-    const HOTELS = {
-      'Варшава': ['Intercontinental', 'HolidayInn', 'Gromada', 'Boss'],
-      'Краків': ['Copernicus', 'Hotel Stary', 'Grand Hotel Kraków'],
-      'Вроцлав': ['The Bridge', 'Monopol', 'Altus Palace'],
-      'Гданськ': ['Radisson Blu', 'Hilton', 'Boutique'],
-      'Познань': ['City Park Hotel & Residence', 'Blow Up Hall', 'Sheraton']
-    };
-    const opt = (v, t) => `<option value="${esc(v)}">${esc(t ?? v)}</option>`;
+    function fillCities() {
+      const cs = Object.keys(HOTELS);
+      const rc = $('city').value, ac = $('resCity').value;
+      $('city').innerHTML = `<option value="" disabled>${esc(t('pickCity'))}</option>` + cs.map(c => opt(c, t(c))).join('');
+      $('city').value = rc;
+      $('resCity').innerHTML = cs.map(c => opt(c, t(c))).join('');
+      $('resCity').value = ac || cs[0];
+    }
     function toggleManual() {
       const m = $('resHotel').value === MANUAL;
       $('resName').classList.toggle('hidden', !m);
       $('resName').required = m;
     }
     function fillHotels() {
-      $('resHotel').innerHTML = HOTELS[$('resCity').value].map(h => opt(h)).join('') + opt(MANUAL, '✍️ Інший (вручну)');
+      $('resHotel').innerHTML = HOTELS[$('resCity').value].map(h => opt(h)).join('') + opt(MANUAL, t('manual'));
       toggleManual();
     }
-    $('resCity').innerHTML = Object.keys(HOTELS).map(c => opt(c)).join('');
+
+    function setLang(l) {
+      lang = l;
+      localStorage.setItem('kelner_lang', l);
+      document.documentElement.lang = l;
+      $('lang').value = l;
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      $('fullName').placeholder = { uk: 'Олександр Іванов', pl: 'Jan Kowalski', ru: 'Александр Иванов', en: 'John Smith' }[l];
+      $('resName').placeholder = { uk: 'Назва закладу', pl: 'Nazwa obiektu', ru: 'Название заведения', en: 'Venue name' }[l];
+      const hv = $('resHotel').value;
+      fillCities();
+      fillHotels();
+      if ([...$('resHotel').options].some(o => o.value === hv)) $('resHotel').value = hv;
+      toggleManual();
+      buildContacts();
+      render();
+    }
+
+    $('lang').innerHTML = Object.entries(LANGS).map(([k, v]) => opt(k, v[0])).join('');
+    $('lang').addEventListener('change', e => setLang(e.target.value));
     $('resCity').addEventListener('change', fillHotels);
     $('resHotel').addEventListener('change', toggleManual);
-    fillHotels();
+    $('resDate').min = today();
 
     $('profileForm').addEventListener('submit', e => {
       e.preventDefault();
@@ -326,10 +420,11 @@
           city: $('resCity').value, date: $('resDate').value,
           time: $('resTime').value, pay: $('resPay').value
         });
-        e.target.reset(); fillHotels();
+        e.target.reset();
+        fillHotels();
         render();
-        alert('Зміну додано!');
-      } catch (err) { alert('Помилка: ' + err.message); }
+        alert(t('added'));
+      } catch (err) { alert(t('err') + err.message); }
       finally { busy = false; }
     });
 
@@ -346,26 +441,26 @@
       try {
         if (act === 'book') {
           const p = profile();
-          if (!p) throw new Error('Спочатку заповніть анкету');
+          if (!p) throw new Error(t('fillFirst'));
           state = await api('bookShift', { shiftId: id, fullName: p.fullName, phone: p.phone });
           render();
-          alert('Заявку надіслано адміністратору!');
+          alert(t('reqSent'));
         } else if (act === 'del') {
-          if (confirm('Видалити цю зміну?')) { state = await api('deleteShift', { id }); render(); }
+          if (confirm(t('delQ'))) { state = await api('deleteShift', { id }); render(); }
         } else if (act === 'st') {
           state = await api('updateStatus', { id, status: s });
           render();
-          alert(state.notified ? `Статус: ${s}. Працівника сповіщено.`
-            : `Статус: ${s}. ⚠️ Сповіщення не доставлено — працівник ще не запускав бота (/start).`);
+          alert(t(state.notified ? 'stOk' : 'stNo', t(s)));
         }
-      } catch (err) { alert('Помилка: ' + err.message); load(); }
+      } catch (err) { alert(t('err') + err.message); load(); }
       finally { busy = false; btn.disabled = false; }
     });
 
     setInterval(() => { if (!document.hidden && !busy && ready) load(); }, 15000);
 
-    if (!tg.initData) { $('msg').textContent = '⚠️ Відкрийте додаток через Telegram-бота.'; }
-    else load();
+    setLang(lang);
+    if (!tg.initData) { $('msg').textContent = '⚠️ ' + t('openTg'); }
+    else { $('msg').textContent = t('loading'); load(); }
   </script>
 </body>
 </html>
