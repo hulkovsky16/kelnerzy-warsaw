@@ -297,7 +297,7 @@
           ready = true;
           // Мова, обрана в боті або раніше, приходить із сервера
           if (state.lang) { localStorage.setItem('kelner_lang_chosen', '1'); if (state.lang !== lang) setLang(state.lang, true); }
-          go(!localStorage.getItem('kelner_lang_chosen') ? 'lang' : state.role !== 'admin' && !profile() ? 'reg' : 'home');
+          go(state.role !== 'admin' && !profile() ? 'reg' : 'home');
         } else render();
       } catch (e) {
         console.error(e);
